@@ -1,0 +1,137 @@
+/*                       PROGRAMAÇÃO DE UM ROBÔ SEGUIDOR DE LINHA COM ARDUINO
+                      
+     Código desenvolvido pelos alunos de Engenharia Elétrica do 6º Semestre para  a Disciplina - Projeto Integrado II
+
+                "ROBÔ SEGUIDOR DE LINHAS PARA COMPETIÇÃO DE ROBÓTICA DA SEMANA DE ENGENHARIA 2015.2"
+
+    OBS: A biblioteca "Ultrasonic.h" por ser encontrada no site "CYTRON":
+    http://tutorial.cytron.com.my/2012/10/11/testing-ultrasonic-ranging-module-sn-hc-sr04/
+    
+*/
+
+// _________________________________________________________________________________________________________________________//
+
+
+#include "Ultrasonic.h"                         // Inclui a biblioteca de controle do sensor HC-SR04
+Ultrasonic ultrasonic(10,9);                    // Define a pinagem utilizada para trafego de dados com o sensor
+const int botao = A0;                           // Define o pino do Arduino que será tratado como botao
+const int LedOn = 12;                           // Define o pino do Arduino que será tratado como LED de estado ON 
+const int LedOff = 13;                          // Define o pino do Arduino que será tratado como LED de estado OFF
+const int MotorEsquerdo = 5;                    // Define o pino do Arduino que controla a velocidade o motor esquerdo
+const int MotorDireito = 6;                     // Define o pino do Arduino que controla a velocidade o motor direito
+const int SentidoMotorEsquerdo = 7;             // Define o pino do Arduino que controla o sentido de rotação o motor esquerdo
+const int SentidoMotorDireito = 8;              // Define o pino do Arduino que controla o sentido de rotação o motor direito
+const int Sensor1esquerdo = A1;                 // Define o pino do Arduino que controla a leitura do sensor 1 esquerdo
+const int Sensor1direito = A2;                  // Define o pino do Arduino que controla a leitura do sensor 1 direito
+const int linha = 700;                          // Define a constante "linha" com o valor de 700
+int ValorDaEntradaA0 = 0;                       // Define a variável "ValorDaEntradaA0" com o valor inicial 0  
+int ContagemDoBotao = 0;                        // Define a variável "ContagemDoBotao" com o valor inicial 0
+
+void setup()                                    // Rotina de configuração inicial da programação
+{  
+  pinMode (botao, INPUT);                       // Define que o pino botao será usado como entrada
+  pinMode (LedOn, OUTPUT);                      // Define que o pino LedOn será usado como saída
+  pinMode (LedOff, OUTPUT);                     // Define que o pino LedOff será usado como saída
+  pinMode(MotorEsquerdo, OUTPUT);               // Define que o pino MotorEsquerdo será usado como saída
+  pinMode(MotorDireito, OUTPUT);                // Define que o pino MotorDireito será usado como saída
+  pinMode(SentidoMotorEsquerdo, OUTPUT);        // Define que o pino SentidoMotorEsquerdo será usado como saída
+  pinMode(SentidoMotorDireito, OUTPUT);         // Define que o pino SentidoMotorDireito será usado como saída
+  pinMode(Sensor1esquerdo, INPUT);              // Define que o pino Sensor1esquerdo será usado como entrada
+  pinMode(Sensor1direito, INPUT);               // Define que o pino Sensor1direito será usado como entrada
+}
+
+void loop()                                     // Scrip que será executação periódicamente infinitas vezes
+{
+  ValorDaEntradaA0 = analogRead(botao);         // Define "ValorDaEntradaA0" como sendo o mesmo valor mensurado no pino "botao"
+    
+  if (ValorDaEntradaA0 > 500 && ValorDaEntradaA0 < 550)     // Função que compara o valor da variável com os valores pré estabelecidos (executa o comando em caso de "correto")
+  {
+    opcao ('1');                                            // Comando que executa uma função secundária
+    delay (1000);                                           // Período que o programa aguardará até a proxima ação
+  }
+
+  if (ContagemDoBotao == 1 && ultrasonic.Ranging(CM) > 10 ) // Função que compara o valor das variáveis com os valores pré estabelecidos (executa o comando em caso de "correto")
+  {                                                         // OBS: A variavel ultrasonic.Ranging(CM) está pré estabelecida pela biblioteca do sensor HB-SR04
+    opcao ('2');                                            // Comando que executa uma função secundária
+    delay(5);                                               // Período que o programa aguardará até a proxima ação
+  }
+
+  if (ultrasonic.Ranging(CM) <= 10)                         // Função que compara o valor da variável com o valor pré estabelecido (executa o comando em caso de "correto")
+  {
+     digitalWrite(SentidoMotorDireito, LOW);                // Define qual será o sentido de rotação do motor direito
+     digitalWrite(SentidoMotorEsquerdo, HIGH);              // Define qual será o sentido de rotação do motor esquerdo
+     analogWrite(MotorDireito, 0);                          // Define qual será a velocidade do motor direito
+     analogWrite(MotorEsquerdo, 0);                         // Define qual será a velocidade do motor esquerdo
+     delay (10000);                                         // Período que o programa aguardará até a proxima ação
+  }
+
+  else {}                                                   // Comando a ser executado caso nenhuma outra função seja verdadeira
+}
+
+void opcao(char estado)                                     // Script secundário, será executado caso chamado em condições específicas
+{
+  switch(estado)                                            // Função compara o valor de uma única variável com diferentes valores especificados em cada "case"
+  {
+    case '1':                                               // Primeira opção da função "switch"
+    ContagemDoBotao++;                                      // Soma o valor de 1 a variável "ContagemDoBotao"
+    if (ContagemDoBotao == 1)                               // Função que compara o valor da variável com o valor pré estabelecido (executa o comando em caso de "correto")
+    {
+      digitalWrite(LedOn,HIGH);                             // Define como ligado o LED de estado ON
+      delay(1500);                                          // Período que o programa aguardará até a proxima ação
+      digitalWrite(LedOn,LOW);                              // Define como desligado o LED de estado ON
+      delay(300);                                           // Período que o programa aguardará até a proxima ação
+    }
+
+    if (ContagemDoBotao == 2)                               // Função que compara o valor da variável com o valor pré estabelecido (executa o comando em caso de "correto")
+    {
+      digitalWrite(SentidoMotorDireito, LOW);               // Define qual será o sentido de rotação do motor direito
+      digitalWrite(SentidoMotorEsquerdo, HIGH);             // Define qual será o sentido de rotação do motor esquerdo
+      analogWrite(MotorDireito, 0);                         // Define qual será a velocidade do motor direito
+      analogWrite(MotorEsquerdo, 0);                        // Define qual será a velocidade do motor direito
+      digitalWrite(LedOff,HIGH);                            // Define como ligado o LED de estado OFF
+      delay(1500);                                          // Período que o programa aguardará até a proxima ação
+      digitalWrite(LedOff,LOW);                             // Define como desligado o LED de estado OFF
+      delay(300);                                           // Período que o programa aguardará até a proxima ação
+      ContagemDoBotao = 0;                                  // Define o valor da variável como 0
+ 
+    }
+    break;                                                  // Encerra a função "switch" voltando ao loop comum
+    
+
+    case '2':                                               // Segunda opção da função "switch"
+    int ValorEsquerdo = digitalRead(Sensor1esquerdo);       // Define a variável "ValorEsquerdo" como o valor da leitura do pino Sensor1esquerdo 
+    int ValorDireito = digitalRead(Sensor1direito);         // Define a variável "ValorDireito" como o valor da leitura do pino Sensor1direito
+   
+    if (ValorEsquerdo < linha && ValorDireito < linha )     // Condição que verifica a leitura do ValorEsquerdo e ValorDireito
+    {
+      digitalWrite(SentidoMotorDireito, LOW);               // Define qual será o sentido de rotação do motor direito
+      digitalWrite(SentidoMotorEsquerdo, HIGH);             // Define qual será o sentido de rotação do motor esquerdo
+      analogWrite(MotorDireito, 80);                        // Define qual será a velocidade do motor direito
+      analogWrite(MotorEsquerdo, 80);                       // Define qual será a velocidade do motor esquerdo
+    }
+
+    if (ValorEsquerdo > linha && ValorDireito < linha )     // Condição que verifica a leitura do ValorEsquerdo e ValorDireito
+    {
+      digitalWrite(SentidoMotorDireito, LOW);               // Define qual será o sentido de rotação do motor direito
+      digitalWrite(SentidoMotorEsquerdo, HIGH);             // Define qual será o sentido de rotação do motor esquerdo
+      analogWrite(MotorDireito, 80);                       // Define qual será a velocidade do motor direito
+      analogWrite(MotorEsquerdo, 0);                        // Define qual será a velocidade do motor esquerdo
+    }
+
+    if (ValorEsquerdo < linha && ValorDireito > linha )     // Condição que verifica a leitura do ValorEsquerdo e ValorDireito
+    {
+      digitalWrite(SentidoMotorDireito, LOW);               // Define qual será o sentido de rotação do motor direito
+      digitalWrite(SentidoMotorEsquerdo, HIGH);             // Define qual será o sentido de rotação do motor esquerdo
+      analogWrite(MotorDireito, 0);                         // Define qual será a velocidade do motor direito
+      analogWrite(MotorEsquerdo, 80);                      // Define qual será a velocidade do motor esquerdo
+    }
+
+    else                                                    // Ação a ser tomada se nenhuma das outras alternativas forem confirmadas
+    {
+      digitalWrite(SentidoMotorDireito, LOW);               // Define qual será o sentido de rotação do motor direito
+      digitalWrite(SentidoMotorEsquerdo, HIGH);             // Define qual será o sentido de rotação do motor esquerdo
+      analogWrite(MotorDireito, 0);                         // Define qual será a velocidade do motor direito
+      analogWrite(MotorEsquerdo, 0);                        // Define qual será a velocidade do motor esquerdo
+    }
+    break;                                                  // Encerra a função "switch" voltando ao loop comum
+}}
